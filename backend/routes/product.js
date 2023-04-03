@@ -72,7 +72,25 @@ router.post('/api/products', authMiddleware, async (req, res, next) => {
 })
 
 router.put('/api/products/:productId', async (req, res) => {
-  res.status(600).send()
+  try{
+    const { productId } = req.params
+    const { name, description, pictureUrl, category, originalPrice, startDate, endDate, sellerId } = req.body
+    const product = await Product.update({
+      name,
+      description,
+      pictureUrl,
+      category,
+      originalPrice,
+      startDate,
+      endDate,
+      sellerId : req.user.id
+    }, {
+      where: { id: productId }
+    })
+    res.status(200).send('Product updated successfully')
+  }catch(error){
+    next(error)
+  }
 })
 
 router.delete('/api/products/:productId', async (req, res) => {
