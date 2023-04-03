@@ -34,6 +34,21 @@ async function getProduct() {
   }
 }
 
+async function getUserById(userId) {
+  try {
+    const response = await fetch(`http://localhost:3000/api/users/${userId}`);
+    const user = await response.json();
+    return user.name;
+  } catch (err) {
+    console.error(err);
+    return "";
+  }
+}
+
+const sellerName = computed(() => {
+  return getUserById(product.value.sellerId);
+});
+
 function startCountdown() {
   if (countdownInterval.value) clearInterval(countdownInterval.value);
   const endDate = new Date(product.value.endDate);
@@ -118,8 +133,8 @@ getProduct();
           <li data-test-product-end-date>Date de fin : {{ formatDate(product.endDate) }}</li>
           <li>
             Vendeur :
-            <router-link :to="{ name: 'User', params: { userId: 'TODO' } }" data-test-product-seller>
-              alice
+            <router-link :to="{ name: 'User', params: { userId: product.sellerId } }" data-test-product-seller>
+              {{ sellerName }}
             </router-link>
           </li>
         </ul>
