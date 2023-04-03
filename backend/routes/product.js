@@ -29,7 +29,24 @@ router.get('/api/products', async (req, res, next) => {
 })
 
 router.get('/api/products/:productId', async (req, res) => {
-  res.status(600).send()
+  const { productId } = req.params
+  const product = await Product.findOne({
+    where: { id: productId },
+    include: [
+      {
+        as : 'bids',
+        model: Bid,
+        include: [
+          {
+            as : 'bidder',
+            model: User,
+            attributes: ['id', 'username']
+          }
+        ]
+      }
+    ]
+  })
+  res.status(200).send(product)
 })
 
 // You can use the authMiddleware with req.user.id to authenticate your endpoint ;)
