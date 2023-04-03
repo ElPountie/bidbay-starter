@@ -11,6 +11,7 @@ const router = useRouter();
 
 const productId = ref(route.params.productId);
 const product = ref({});
+const user = ref({});
 const loading = ref(true);
 const error = ref(false);
 const countdown = ref("");
@@ -27,6 +28,7 @@ async function getProduct() {
     product.value = await response.json();
     loading.value = false;
     startCountdown();
+    getUserById();
   } catch (err) {
     console.error(err);
     error.value = true;
@@ -34,20 +36,16 @@ async function getProduct() {
   }
 }
 
-async function getUserById(userId) {
+async function getUserById() {
   try {
-    const response = await fetch(`http://localhost:3000/api/users/${userId}`);
-    const user = await response.json();
-    return user.name;
+    const response = await fetch(`http://localhost:3000/api/users/${product.value.sellerId}`);
+    user.value = await response.json();
+    return user.username;
   } catch (err) {
     console.error(err);
     return "";
   }
 }
-
-const sellerName = computed(() => {
-  return getUserById(product.value.sellerId);
-});
 
 function startCountdown() {
   if (countdownInterval.value) clearInterval(countdownInterval.value);
@@ -111,7 +109,7 @@ getProduct();
             </h1>
           </div>
           <div class="col-lg-6 text-end">
-            <RouterLink :to="{ name: 'ProductEdition', params: { productId: 'TODO' } }" class="btn btn-primary"
+            <RouterLink :to="{ name: 'ProductEdition', params: { productId: product.id } }" class="btn btn-primary"
               data-test-edit-product>
               Editer
             </RouterLink>
@@ -133,8 +131,8 @@ getProduct();
           <li data-test-product-end-date>Date de fin : {{ formatDate(product.endDate) }}</li>
           <li>
             Vendeur :
-            <router-link :to="{ name: 'User', params: { userId: product.sellerId } }" data-test-product-seller>
-              {{ sellerName }}
+            <router-link :to="{ name: 'User', params: { userId: product.sellerId} }" data-test-product-seller>
+              {{ user.username }}
             </router-link>
           </li>
         </ul>
@@ -150,10 +148,10 @@ getProduct();
             </tr>
           </thead>
           <tbody>
-            <tr v-for="i in 10" :key="i" data-test-bid>
+            <tr v-for="bid in product.bids" :key="bid.id">
               <td>
                 <router-link :to="{ name: 'User', params: { userId: 'TODO' } }" data-test-bid-bidder>
-                  charly
+                  {{ user.username }}
                 </router-link>
               </td>
               <td data-test-bid-price>43 €</td>
