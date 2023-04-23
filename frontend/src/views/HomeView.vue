@@ -96,6 +96,15 @@ fetchProducts();
           <div class="card-body">
             <h5 class="card-title">{{ product.name }}</h5>
             <p class="card-text">{{ product.description }}</p>
+            <p class="card-text">
+              Vendeur :
+              <RouterLink
+                data-test-product-seller
+                :to="{ name: 'User', params: { userId: product.seller.id } }"
+              >
+                {{product.seller.username}}
+              </RouterLink>
+            </p>
             <p class="card-text">{{ product.originalPrice }} €</p>
           </div>
         </div>
